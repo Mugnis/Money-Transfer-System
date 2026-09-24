@@ -19,7 +19,7 @@ func (u *User) Withdraw(amount float64) error {
 	if u.Balance < amount {
 		return errors.New("Insufficient funds")
 	} else {
-		u.Balance += amount
+		u.Balance -= amount
 		return nil
 	}
 }
