@@ -10,6 +10,7 @@ type User struct {
 	ID      string
 	Name    string
 	Balance float64
+	mu      sync.Mutex
 }
 
 type Transaction struct {
@@ -38,10 +39,9 @@ func (p *PaymentSystem) ProcessingTransactions(t Transaction) error {
 		return errors.New("User not found")
 	}
 
-	if user1.Balance < t.Amount {
-		return errors.New("Insufficient funds")
+	if err := user1.Withdraw(t.Amount); err != nil {
+		return err
 	}
-	user1.Withdraw(t.Amount)
 
 	user2, ok := p.Users[t.ToID]
 
@@ -85,12 +85,12 @@ func main() {
 		Users:            make(map[string]*User),
 		TransactionQueue: make([]Transaction, 0),
 	}
-	ch := make(chan Transaction, len(ps.TransactionQueue))
-	var wg sync.WaitGroup
 	ps.AddUser(user1)
 	ps.AddUser(user2)
 	ps.AddTransaction(t1)
 	ps.AddTransaction(t2)
+	ch := make(chan Transaction, len(ps.TransactionQueue))
+	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go Worker(ch, ps, &wg)
