@@ -54,10 +54,14 @@ func (p *PaymentSystem) ProcessingTransactions(t Transaction) error {
 }
 
 func (u *User) Deposit(amount float64) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
 	u.Balance += amount
 }
 
 func (u *User) Withdraw(amount float64) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
 	if u.Balance < amount {
 		return errors.New("Insufficient funds")
 	} else {
