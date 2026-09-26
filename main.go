@@ -31,22 +31,17 @@ func (p *PaymentSystem) AddTransaction(t Transaction) {
 }
 
 func (p *PaymentSystem) ProcessingTransactions(t Transaction) error {
-	user1, ok := p.Users[t.FromID]
+	user1, ok1 := p.Users[t.FromID]
+	user2, ok2 := p.Users[t.ToID]
 
-	if !ok {
+	if !ok1 || !ok2 {
 		return errors.New("User not found")
 	}
 
-	if user1.Balance < t.Amount {
-		return errors.New("Insufficient funds")
+	if err := user1.Withdraw(t.Amount); err != nil {
+		return err
 	}
-	user1.Withdraw(t.Amount)
 
-	user2, ok := p.Users[t.ToID]
-
-	if !ok {
-		return errors.New("User not found")
-	}
 	user2.Deposit(t.Amount)
 
 	return nil
