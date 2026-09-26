@@ -34,4 +34,6 @@ func main() {
 	fmt.Println(user2.Balance)
 	user3.Withdraw(100)
 	fmt.Println(user3.Balance)
+	user1.Deposit(40)
+	fmt.Println(user1.Balance)
 }
